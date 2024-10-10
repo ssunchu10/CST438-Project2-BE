@@ -1,4 +1,5 @@
 django
 djangorestframework
 environs
-mysqlclient
+mysqlclient==2.1.1
+dj-database-url

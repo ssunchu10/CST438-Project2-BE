@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,15 +78,23 @@ WSGI_APPLICATION = 'Project02.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gx8ww0d2h1x95tuu',  
-        'USER': 'er22dqpm3b2f5lk5',  
-        'PASSWORD': 'et9rd4br1jvdnjdj', 
-        'HOST': 'ao9moanwus0rjiex.cbetxkdyhwsb.us-east-1.rds.amazonaws.com', 
-        'PORT': '3306',  
-    }
+    'default': dj_database_url.config(default='mysql://er22dqpm3b2f5lk5:et9rd4br1jvdnjdj@db:3306/gx8ww0d2h1x95tuu')
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'gx8ww0d2h1x95tuu',  
+#         'USER': 'er22dqpm3b2f5lk5',  
+#         'PASSWORD': 'et9rd4br1jvdnjdj', 
+#         # 'HOST': 'ao9moanwus0rjiex.cbetxkdyhwsb.us-east-1.rds.amazonaws.com', 
+#         'HOST': 'db',
+#         'PORT': '3306',  
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#         }
+#     }
+# }
 
 
 # Password validation

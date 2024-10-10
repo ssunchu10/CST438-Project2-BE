@@ -11,8 +11,11 @@ services:
     environment:
       - DEBUG=True
       - SECRET_KEY=django-insecure-j-a)y)110knet8ih7krgpuc6#)c1%vf3!c6n-txch9$0qjrgmi
-      - DATABASE_URL=mysql://er22dqpm3b2f5lk5:et9rd4br1jvdnjdj@db:3306/gx8ww0d2h1x95tuu
-      # DATABASE_URL=mysql://er22dqpm3b2f5lk5:et9rd4br1jvdnjdj@ao9moanwus0rjiex.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/gx8ww0d2h1x95tuu
+      - MYSQL_DATABASE=gx8ww0d2h1x95tuu
+      - MYSQL_USER=er22dqpm3b2f5lk5
+      - MYSQL_PASSWORD=et9rd4br1jvdnjdj
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
     volumes:
       - .:/new_app
     depends_on:
@@ -32,3 +35,39 @@ services:
 
 volumes:
   db_data:
+
+
+# version: '3.8'
+
+# services:
+#   web:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     command: python manage.py runserver 0.0.0.0:8000
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       - DEBUG=True
+#       - SECRET_KEY=django-insecure-j-a)y)110knet8ih7krgpuc6#)c1%vf3!c6n-txch9$0qjrgmi
+#       - DATABASE_URL=mysql://er22dqpm3b2f5lk5:et9rd4br1jvdnjdj@db:3306/gx8ww0d2h1x95tuu
+#       # DATABASE_URL=mysql://er22dqpm3b2f5lk5:et9rd4br1jvdnjdj@ao9moanwus0rjiex.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/gx8ww0d2h1x95tuu
+#     volumes:
+#       - .:/new_app
+#     depends_on:
+#       - db
+
+#   db:
+#     image: mariadb:10.6
+#     environment:
+#       MYSQL_ROOT_PASSWORD: root
+#       MYSQL_DATABASE: gx8ww0d2h1x95tuu
+#       MYSQL_USER: er22dqpm3b2f5lk5
+#       MYSQL_PASSWORD: et9rd4br1jvdnjdj
+#     ports:
+#       - "3307:3306"
+#     volumes:
+#       - db_data:/var/lib/mysql
+
+# volumes:
+#   db_data:
