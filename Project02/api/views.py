@@ -5,6 +5,8 @@ from rest_framework import generics
 from projectApp.models import User, Item, List
 from .serializers import UserSerializer, ItemSerializer
 from rest_framework.views import APIView
+from rest_framework import status
+
 
 # Show all users 
 @api_view(['GET'])
