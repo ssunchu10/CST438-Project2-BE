@@ -3,10 +3,9 @@ from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.decorators import api_view
 from rest_framework import generics
 from projectApp.models import User, Item, List
-from .serializers import UserSerializer, ItemSerializer
+from .serializers import UserSerializer, ItemSerializer, ListSerializer
 from rest_framework.views import APIView
 from rest_framework import status
-
 
 # Show all users 
 @api_view(['GET'])
@@ -132,11 +131,19 @@ class ItemList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        list_id = request.data.get('list_id')
+        try:
+            list_obj = List.objects.get(id=list_id)  
+        except List.DoesNotExist:
+            return Response({'error': f'List with id {list_id} does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = ItemSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ItemDetail(APIView):
@@ -157,3 +164,17 @@ class ItemDetail(APIView):
         item = get_object_or_404(Item, id=item_id)
         item.delete()
         return Response({'message': 'Item deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ListCreateAPIView(APIView):
+    def post(self, request):
+        if('user_id' not in request.session):
+            return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+        request.data['user'] = request.session['user_id']
+        serializer = ListSerializer(data=request.data)
+
+        if(serializer.is_valid()):
+            list_instance = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
