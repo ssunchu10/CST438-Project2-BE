@@ -115,10 +115,10 @@ def logout(request):
         return Response({'error': 'No user is logged in.'}, status=400)
     
 # Delete logged in account (is it okay to have delete as post? since we need to confirm the password)
-@api_view(['POST'])
+@api_view(['DELETE'])
 def deleteAccount(request):
-    # Grab password from
-    password = request.data.get('password')
+    # Grab password from user first, using front-end
+    # password = request.data.get('password')
     if 'user_id' in request.session:
         user_id = request.session['user_id']
     else:
@@ -127,14 +127,12 @@ def deleteAccount(request):
         # Grab user object by ID
         user = User.objects.get(id=user_id)
         # Password Confirmation before Deletion
-        if(check_password(password, user.password)):
+        # if(check_password(password, user.password)):
             # Delete User
-            user.delete()
+        user.delete()
             # Clear the session
-            request.session.flush() 
-            return Response({"message": "User deleted successfully"}, status=200)
-        else:
-            return Response({"error": "Incorrect password"}, status=400)
+        request.session.flush() 
+        return Response({"message": "User deleted successfully"}, status=200)
     except User.DoesNotExist:
             return Response({'error': 'User not found.'}, status=400)
 
