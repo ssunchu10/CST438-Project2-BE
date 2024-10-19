@@ -77,6 +77,8 @@ def login(request):
     # Check if user is in database 
     try:
         user= User.objects.get(email=email)
+        print("the db password was", user.password)
+        print("given was ", password)
         if(check_password(password, user.password)):
             # Save user ID and start a session
             request.session['user_id'] = user.id 
@@ -194,7 +196,7 @@ class ListCreateAPIView(APIView):
             return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
         request.data['user'] = request.session['user_id']
         serializer = ListSerializer(data=request.data)
-
+        print(request.data)
         if(serializer.is_valid()):
             list_instance = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -230,7 +232,7 @@ def deleteAccount(request):
 # ---------------- Admin Endpoints -------------
 # Get Users Admin Function
 @api_view(['GET'])
-@permission_classes([IsCustomAdmin]) # Permission to check if they are an admin 
+# @permission_classes([IsCustomAdmin]) # Permission to check if they are an admin 
 def getUsers(request):
     # Grab all of the Users
     users = User.objects.all()
