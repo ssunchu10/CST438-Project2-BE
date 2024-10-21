@@ -1,5 +1,6 @@
 django==4.1.*
 djangorestframework
+django-cors-headers
 environs
 mysqlclient==2.1.1
 dj-database-url
