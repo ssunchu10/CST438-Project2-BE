@@ -1,13 +1,20 @@
 from rest_framework.response import Response
+from django.contrib.auth.hashers import make_password, check_password
+from rest_framework.decorators import api_view
+from rest_framework import generics
+from projectApp.models import User, Item, List
+from .serializers import UserSerializer, ItemSerializer, ListSerializer
+from rest_framework.views import APIView
+from rest_framework import status
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.hashers import check_password
 from rest_framework.decorators import api_view, permission_classes
-from projectApp.models import User
 from .serializers import UserSerializer
 from .permissions import IsCustomAdmin
+from django.shortcuts import get_object_or_404
 
+
+#views.py
 # ---------------- User Endpoints -------------
 @api_view(['GET'])
 def landingPage(request):
@@ -70,6 +77,8 @@ def login(request):
     # Check if user is in database 
     try:
         user= User.objects.get(email=email)
+        print("the db password was", user.password)
+        print("given was ", password)
         if(check_password(password, user.password)):
             # Save user ID and start a session
             request.session['user_id'] = user.id 
@@ -113,6 +122,87 @@ def logout(request):
             return Response({'error': 'User not found.'}, status=400)
     else:
         return Response({'error': 'No user is logged in.'}, status=400)
+
+
+class ItemList(APIView):
+    def get(self, request):
+        list_id = request.query_params.get('list')
+        user_id = request.query_params.get('user')
+        item_id = request.query_params.get('itemID')
+        if list_id:
+            try:
+                item_list = List.objects.get(id=list_id)
+                if item_list.is_public:
+                    items = Item.objects.filter(list_id=item_list.id)
+                else:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+            except List.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        elif user_id:
+            if 'user_id' in request.session and request.session['user_id'] == int(user_id):
+                items = Item.objects.filter(list__user_id=user_id)
+            else:
+                return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+        elif item_id:
+            item = get_object_or_404(Item, id=item_id)
+            serializer = ItemSerializer(item)
+            return Response(serializer.data)
+
+        else:
+            items = Item.objects.all()
+
+        serializer = ItemSerializer(items, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        list_id = request.data.get('list_id')
+        try:
+            list_obj = List.objects.get(id=list_id)  
+        except List.DoesNotExist:
+            return Response({'error': f'List with id {list_id} does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = ItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ItemDetail(APIView):
+    def get(self, request, item_id):
+        item = get_object_or_404(Item, id=item_id)
+        serializer = ItemSerializer(item)
+        return Response(serializer.data)
+
+    def patch(self, request, item_id):
+        item = get_object_or_404(Item, id=item_id)
+        serializer = ItemSerializer(item, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, item_id):
+        item = get_object_or_404(Item, id=item_id)
+        item.delete()
+        return Response({'message': 'Item deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ListCreateAPIView(APIView):
+    def post(self, request):
+        if('user_id' not in request.session):
+            return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+        request.data['user'] = request.session['user_id']
+        serializer = ListSerializer(data=request.data)
+        print(request.data)
+        if(serializer.is_valid()):
+            list_instance = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 # Delete logged in account (is it okay to have delete as post? since we need to confirm the password)
 @api_view(['POST'])
@@ -142,7 +232,7 @@ def deleteAccount(request):
 # ---------------- Admin Endpoints -------------
 # Get Users Admin Function
 @api_view(['GET'])
-@permission_classes([IsCustomAdmin]) # Permission to check if they are an admin 
+# @permission_classes([IsCustomAdmin]) # Permission to check if they are an admin 
 def getUsers(request):
     # Grab all of the Users
     users = User.objects.all()
