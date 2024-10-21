@@ -228,7 +228,38 @@ class UserListAPIView(APIView):
         serializer = ListSerializer(lists, many=True)
         return Response(serializer.data)
 
-        
+class AddEntryAPIView(APIView):
+    def post(self, request, list_id):
+        if 'user_id' not in request.session:
+            return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        list_instance = get_object_or_404(List, id=list_id)
+        item_id = request.data.get('item')
+
+        item_instance = get_object_or_404(Item, id=item_id)
+
+        entry_data = {
+            'list': list_instance.id,
+            'item': item_id
+        }
+        serializer = EntrySerializer(data=entry_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ListItems(APIView):
+    def get(self, request, list_id):
+        entries = Entry.objects.filter(list_id=list_id)
+        if not entries.exists():
+            return Response({'error': 'No items found for this list.'}, status=status.HTTP_404_NOT_FOUND)
+
+        item_ids = entries.values_list('item_id', flat=True)
+        items = Item.objects.filter(id__in=item_ids)
+        serializer = ItemSerializer(items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 # ---------------- Admin Endpoints -------------
 # Get Users Admin Function
 @api_view(['GET'])

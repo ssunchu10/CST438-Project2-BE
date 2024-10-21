@@ -33,4 +33,4 @@ class Entry(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='entries')
 
     def __str__(self):
-        return f"{self.list_id.name} - {self.item_id.item_name}"
+        return f"{self.list.name} - {self.item.item_name}"

@@ -17,7 +17,8 @@ class ListSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'name', 'is_public']
 
 class EntrySerializer(serializers.ModelSerializer):
-    item = ItemSerializer()
+    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
+    # ItemSerializer()
     class Meta:
         model = Entry
         fields = ['id', 'list', 'item']
