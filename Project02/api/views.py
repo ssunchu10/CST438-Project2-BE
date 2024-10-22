@@ -271,7 +271,7 @@ def getUsers(request):
 
 # Create Users Admin Function
 @api_view(['PUT'])
-@permission_classes([IsCustomAdmin]) # Permission to check if they are an admin 
+# @permission_classes([IsCustomAdmin]) # Permission to check if they are an admin 
 def createUser(request):
     # Grab fields from admin input 
     email = request.data.get('email')
@@ -302,7 +302,7 @@ def createUser(request):
 
 # Delete User
 @api_view(['DELETE'])
-@permission_classes([IsCustomAdmin])
+# @permission_classes([IsCustomAdmin])
 def deleteUser(request):
     # Use email to identify account
     email = request.query_params.get('email')  
@@ -316,7 +316,7 @@ def deleteUser(request):
     
 # Update User
 @api_view(['PATCH'])
-@permission_classes([IsCustomAdmin])
+# @permission_classes([IsCustomAdmin])
 def updateUser(request):
     # Use email to identify account since emails are unique
     email = request.query_params.get('email') 
