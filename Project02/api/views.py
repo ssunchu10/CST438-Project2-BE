@@ -122,7 +122,7 @@ def logout(request):
         return Response({'error': 'No user is logged in.'}, status=400)
 
 
-# Delete logged in account (confirm passswor should be done with frontend)
+# Delete logged in account (confirm passsword should be done with frontend)
 @api_view(['DELETE'])
 def deleteAccount(request):
     if 'user_id' in request.session:
