@@ -122,29 +122,27 @@ def logout(request):
         return Response({'error': 'No user is logged in.'}, status=400)
 
 
-# Delete logged in account (is it okay to have delete as post? since we need to confirm the password)
-@api_view(['POST'])
+# Delete logged in account (confirm passswor should be done with frontend)
+@api_view(['DELETE'])
 def deleteAccount(request):
-    # Grab password from
-    password = request.data.get('password')
     if 'user_id' in request.session:
         user_id = request.session['user_id']
-    else:
-        return Response({'error': 'No user is logged in.'}, status=400)
-    try:
+        
         # Grab user object by ID
-        user = User.objects.get(id=user_id)
-        # Password Confirmation before Deletion
-        if(check_password(password, user.password)):
-            # Delete User
-            user.delete()
-            # Clear the session
-            request.session.flush() 
-            return Response({"message": "User deleted successfully"}, status=200)
-        else:
-            return Response({"error": "Incorrect password"}, status=400)
-    except User.DoesNotExist:
-            return Response({'error': 'User not found.'}, status=400)
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
+
+        # Delete User
+        user.delete()
+        
+        # Delete the session
+        del request.session['user_id']
+        
+        return Response({"message": "User deleted successfully"}, status=200)
+    else:
+        return Response({"error": "User not logged in"}, status=401)
 
 #####################################
 class ItemList(APIView):
