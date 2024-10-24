@@ -121,6 +121,25 @@ def logout(request):
     else:
         return Response({'error': 'No user is logged in.'}, status=400)
 
+# Update Logged In Account 
+@api_view(['PATCH'])
+# @permission_classes([IsCustomAdmin])
+def updateAccount(request):
+    # Use session to identify account 
+    if 'user_id' in request.session:
+        user_id = request.session['user_id']
+    try:
+        user = User.objects.get(id=user_id)
+        # Check which fields are being changed 
+        if 'email' in request.data:
+            user.email = request.data['email']
+        if 'password' in request.data:
+            user.password = make_password(request.data['password'])
+        user.save()
+        return Response({'message': 'User successfully updated.'}, status=200)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found.'}, status=404)
+
 
 # Delete logged in account (confirm passsword should be done with frontend)
 @api_view(['DELETE'])
