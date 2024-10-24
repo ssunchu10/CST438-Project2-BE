@@ -77,6 +77,7 @@ def login(request):
         user= User.objects.get(email=email)
         print("the db password was", user.password)
         print("given was ", password)
+        request.session['user_id'] = user.id
         if(check_password(password, user.password)):
             # Save user ID and start a session
             request.session['user_id'] = user.id 
@@ -84,10 +85,10 @@ def login(request):
             # Check if admin email 
             # if(email == 'admin@gmail.com'):
             #     return adminLogin(request)
-
+            
             # Serialize user
             serializer = UserSerializer(user)
-            return Response({'data':serializer.data,'message': 'Successfully logged in!'},status=200)
+            return Response({ 'user_id': user.id, 'email': user.email, 'is_admin': user.is_admin,  'message': 'Successfully logged in!'},status=200)
         else: 
              return Response({'error': 'Invalid Password'}, status=400)
 
