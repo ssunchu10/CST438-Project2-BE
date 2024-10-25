@@ -79,8 +79,8 @@ def login(request):
         print("given was ", password)
         if(check_password(password, user.password)):
             # Save user ID and start a session
-            request.session['user_id'] = user.id 
-
+            # request.session['user_id'] = user.id 
+            # print(f"USER SESSION: {request.session}")
             # Check if admin email 
             # if(email == 'admin@gmail.com'):
             #     return adminLogin(request)
@@ -98,16 +98,17 @@ def login(request):
 @api_view(['POST'])
 def logout(request):
     #Logout by deleting the session of the current user_id 
-    if 'user_id' in request.session:
-        user_id = request.session['user_id']
+    # if 'user_id' in request.session:
+    #     user_id = request.session['user_id']
+    #     print(f"USER SESSION: {request.session}")
         # Get user object by ID to see who is logging out
         
         try:
              # Grab user object by ID
             user = User.objects.get(id=user_id)
              # Remove user_id from the session  
-            del request.session['user_id']  
-            
+            # del request.session['user_id']  
+            # print(f"USER SESSION: {request.session}")
             return Response({
                 'message': f'Successfully logged out!',
                 'user': 
@@ -118,16 +119,16 @@ def logout(request):
             }, status=200)
         except User.DoesNotExist:
             return Response({'error': 'User not found.'}, status=400)
-    else:
-        return Response({'error': 'No user is logged in.'}, status=400)
+    # else:
+    #     return Response({'error': 'No user is logged in.'}, status=400)
 
 # Update Logged In Account 
 @api_view(['PATCH'])
 # @permission_classes([IsCustomAdmin])
 def updateAccount(request):
     # Use session to identify account 
-    if 'user_id' in request.session:
-        user_id = request.session['user_id']
+    # if 'user_id' in request.session:
+    #     user_id = request.session['user_id']
     try:
         user = User.objects.get(id=user_id)
         # Check which fields are being changed 
@@ -144,8 +145,8 @@ def updateAccount(request):
 # Delete logged in account (confirm passsword should be done with frontend)
 @api_view(['DELETE'])
 def deleteAccount(request):
-    if 'user_id' in request.session:
-        user_id = request.session['user_id']
+    # if 'user_id' in request.session:
+    #     user_id = request.session['user_id']
         
         # Grab user object by ID
         try:
@@ -157,11 +158,11 @@ def deleteAccount(request):
         user.delete()
         
         # Delete the session
-        del request.session['user_id']
+        # del request.session['user_id']
         
         return Response({"message": "User deleted successfully"}, status=200)
-    else:
-        return Response({"error": "User not logged in"}, status=401)
+    # else:
+    #     return Response({"error": "User not logged in"}, status=401)
 
 #####################################
 class ItemList(APIView):
@@ -213,9 +214,10 @@ class ItemDetail(APIView):
 # ---------------- List and Entry Endpoints -------------
 class ListCreateAPIView(APIView):
     def post(self, request):
-        if 'user_id' not in request.session:
-            return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
-        request.data['user'] = request.session['user_id']
+        # if 'user_id' not in request.session:
+        #     return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+        user_id = request.data.get('user_id')
+        request.data['user'] = user_id
         serializer = ListSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -247,8 +249,8 @@ class UserListAPIView(APIView):
 
 class AddEntryAPIView(APIView):
     def post(self, request, list_id):
-        if 'user_id' not in request.session:
-            return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+        # if 'user_id' not in request.session:
+        #     return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
 
         list_instance = get_object_or_404(List, id=list_id)
         item_id = request.data.get('item')
