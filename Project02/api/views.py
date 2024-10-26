@@ -102,15 +102,18 @@ def logout(request):
     #     user_id = request.session['user_id']
     #     print(f"USER SESSION: {request.session}")
         # Get user object by ID to see who is logging out
-        
+        user_id = request.data.get('user_id')
+        if not user_id:
+            return Response({'error': 'User ID not provided.'}, status=400)
         try:
              # Grab user object by ID
             user = User.objects.get(id=user_id)
+            
              # Remove user_id from the session  
             # del request.session['user_id']  
             # print(f"USER SESSION: {request.session}")
             return Response({
-                'message': f'Successfully logged out!',
+                'message': 'Successfully logged out!',
                 'user': 
                 {
                     'id': user.id,
@@ -129,6 +132,9 @@ def updateAccount(request):
     # Use session to identify account 
     # if 'user_id' in request.session:
     #     user_id = request.session['user_id']
+    user_id = request.data.get('user_id')
+    if not user_id:
+        return Response({'error': 'User ID not provided.'}, status=400)
     try:
         user = User.objects.get(id=user_id)
         # Check which fields are being changed 
@@ -144,10 +150,9 @@ def updateAccount(request):
 
 # Delete logged in account (confirm passsword should be done with frontend)
 @api_view(['DELETE'])
-def deleteAccount(request):
+def deleteAccount(request, user_id):
     # if 'user_id' in request.session:
     #     user_id = request.session['user_id']
-        
         # Grab user object by ID
         try:
             user = User.objects.get(id=user_id)
