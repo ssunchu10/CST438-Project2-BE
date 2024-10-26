@@ -12,8 +12,8 @@ urlpatterns = [
     path('deleteAccount/<int:user_id>/', deleteAccount, name='delete-account'),
     path('updateAccount/', views.updateAccount),
     path('createUser/', views.createUser),
-    path('deleteUser/', views.deleteUser),
-    path('updateUser/', views.updateUser),
+    path('deleteUser/<int:user_id>/', views.deleteUser, name='delete-user'),
+    path('updateUser/<int:user_id>/', views.updateUser, name='update-user'),
     #item paths
     path('getAllItems/', ItemList.as_view(), name='get-all-items'), 
     path('items/<int:item_id>/', ItemDetail.as_view(), name='get-item'),  

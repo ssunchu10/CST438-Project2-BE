@@ -329,26 +329,24 @@ def createUser(request):
 # Delete User
 @api_view(['DELETE'])
 # @permission_classes([IsCustomAdmin])
-def deleteUser(request):
+def deleteUser(request, user_id):
     # Use email to identify account
-    email = request.query_params.get('email')  
+    # email = request.query_params.get('email')  
     try:
         # Grab email object and delete
-        user = User.objects.get(email=email)
+        user = User.objects.get(id=user_id)
         user.delete()
-        return Response({'message': f'User "{email}" successfully deleted.'}, status=204)
+        return Response({'message': f'User ID"{user_id}" successfully deleted.'}, status=204)
     except User.DoesNotExist:
         return Response({'error': 'User not found.'}, status=404)
     
 # Update User
 @api_view(['PATCH'])
 # @permission_classes([IsCustomAdmin])
-def updateUser(request):
+def updateUser(request, user_id):
     # Use email to identify account since emails are unique
-    email = request.query_params.get('email') 
-
     try:
-        user = User.objects.get(email=email)
+        user = User.objects.get(id=user_id)
 
         # Check which fields are being changed 
         if 'email' in request.data:
