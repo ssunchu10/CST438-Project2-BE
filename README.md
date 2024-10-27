@@ -22,9 +22,9 @@ Video: [youtube url]
    pip install -r requirements.txt
    ```
 4. Start the server
- ```bash
-   python manage.py runserver
- ```
+   ```bash
+    python manage.py runserver
+   ```
 # Project 02 Retrospective 
 #### Introduction:
 Communication was managed on Slack through a group chat with all four members. We communicated mainly through sending messages on this chat but we also had a few Slack calls to catch up on what needed to be done and if we had any questions.
