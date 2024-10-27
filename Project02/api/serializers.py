@@ -18,7 +18,6 @@ class ListSerializer(serializers.ModelSerializer):
 
 class EntrySerializer(serializers.ModelSerializer):
     item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
-    # ItemSerializer()
     class Meta:
         model = Entry
         fields = ['id', 'list', 'item']

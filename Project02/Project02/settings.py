@@ -74,11 +74,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Project02.wsgi.application'
 
-# Database
-# Using dj_database_url to automatically configure the database from the environment variable
-# DATABASES = {
-#     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  
