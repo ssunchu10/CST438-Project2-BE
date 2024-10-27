@@ -78,13 +78,6 @@ def login(request):
         print("the db password was", user.password)
         print("given was ", password)
         if(check_password(password, user.password)):
-            # Save user ID and start a session
-            # request.session['user_id'] = user.id 
-            # print(f"USER SESSION: {request.session}")
-            # Check if admin email 
-            # if(email == 'admin@gmail.com'):
-            #     return adminLogin(request)
-
             # Serialize user
             serializer = UserSerializer(user)
             return Response({'data':serializer.data,'message': 'Successfully logged in!'},status=200)
@@ -97,10 +90,6 @@ def login(request):
 # Logout Existing User
 @api_view(['POST'])
 def logout(request):
-    #Logout by deleting the session of the current user_id 
-    # if 'user_id' in request.session:
-    #     user_id = request.session['user_id']
-    #     print(f"USER SESSION: {request.session}")
         # Get user object by ID to see who is logging out
         user_id = request.data.get('user_id')
         if not user_id:
@@ -108,10 +97,6 @@ def logout(request):
         try:
              # Grab user object by ID
             user = User.objects.get(id=user_id)
-            
-             # Remove user_id from the session  
-            # del request.session['user_id']  
-            # print(f"USER SESSION: {request.session}")
             return Response({
                 'message': 'Successfully logged out!',
                 'user': 
@@ -122,16 +107,10 @@ def logout(request):
             }, status=200)
         except User.DoesNotExist:
             return Response({'error': 'User not found.'}, status=400)
-    # else:
-    #     return Response({'error': 'No user is logged in.'}, status=400)
 
 # Update Logged In Account 
 @api_view(['PATCH'])
-# @permission_classes([IsCustomAdmin])
 def updateAccount(request):
-    # Use session to identify account 
-    # if 'user_id' in request.session:
-    #     user_id = request.session['user_id']
     user_id = request.data.get('user_id')
     if not user_id:
         return Response({'error': 'User ID not provided.'}, status=400)
@@ -151,9 +130,6 @@ def updateAccount(request):
 # Delete logged in account (confirm passsword should be done with frontend)
 @api_view(['DELETE'])
 def deleteAccount(request, user_id):
-    # if 'user_id' in request.session:
-    #     user_id = request.session['user_id']
-        # Grab user object by ID
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
@@ -161,13 +137,8 @@ def deleteAccount(request, user_id):
 
         # Delete User
         user.delete()
-        
-        # Delete the session
-        # del request.session['user_id']
-        
         return Response({"message": "User deleted successfully"}, status=200)
-    # else:
-    #     return Response({"error": "User not logged in"}, status=401)
+
 
 #####################################
 class ItemList(APIView):
@@ -219,8 +190,6 @@ class ItemDetail(APIView):
 # ---------------- List and Entry Endpoints -------------
 class ListCreateAPIView(APIView):
     def post(self, request):
-        # if 'user_id' not in request.session:
-        #     return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
         user_id = request.data.get('user_id')
         request.data['user'] = user_id
         serializer = ListSerializer(data=request.data)
@@ -254,9 +223,6 @@ class UserListAPIView(APIView):
 
 class AddEntryAPIView(APIView):
     def post(self, request, list_id):
-        # if 'user_id' not in request.session:
-        #     return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
-
         list_instance = get_object_or_404(List, id=list_id)
         item_id = request.data.get('item')
 
@@ -287,7 +253,6 @@ class ListItems(APIView):
 # ---------------- Admin Endpoints -------------
 # Get Users Admin Function
 @api_view(['GET'])
-# @permission_classes([IsCustomAdmin]) # Permission to check if they are an admin 
 def getUsers(request):
     # Grab all of the Users
     users = User.objects.all()
@@ -297,7 +262,6 @@ def getUsers(request):
 
 # Create Users Admin Function
 @api_view(['PUT'])
-# @permission_classes([IsCustomAdmin]) # Permission to check if they are an admin 
 def createUser(request):
     # Grab fields from admin input 
     email = request.data.get('email')
@@ -328,10 +292,7 @@ def createUser(request):
 
 # Delete User
 @api_view(['DELETE'])
-# @permission_classes([IsCustomAdmin])
-def deleteUser(request, user_id):
-    # Use email to identify account
-    # email = request.query_params.get('email')  
+def deleteUser(request, user_id): 
     try:
         # Grab email object and delete
         user = User.objects.get(id=user_id)
@@ -342,12 +303,10 @@ def deleteUser(request, user_id):
     
 # Update User
 @api_view(['PATCH'])
-# @permission_classes([IsCustomAdmin])
 def updateUser(request, user_id):
     # Use email to identify account since emails are unique
     try:
         user = User.objects.get(id=user_id)
-
         # Check which fields are being changed 
         if 'email' in request.data:
             user.email = request.data['email']
